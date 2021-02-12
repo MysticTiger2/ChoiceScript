@@ -1,0 +1,355 @@
+*comment -------------------------------------
+*comment  This is version 8 (Feb 11 2021)
+*comment  Check on choicescript forums for updates
+*comment  Made by @Twiger_Fluff aka Twig Wisp aka Wispy Twig aka Taco Tiger
+*comment  Starting with version 8, you should, when possible, credit me "@Twiger_Fluff|ChoiceScript forums"
+*comment -------------------------------------
+
+*comment IF YOU ARE READING THIS, I AM SO SORRY I NAMED THESE VARIABLES THE WAY I DID
+*comment but hey, now you dont have to worry about the names clashing with global variables
+
+
+
+*comment ------------- String Functions (substring, substr, indexOf, contains, trim, replaceFirst, replaceAll) -------------
+
+*label substring
+*params s_tring s_tart e_nd o_utput_variable
+*temp i (s_tart - 1)
+*temp l_etter ""
+*set {o_utput_variable} ""
+*label loop1
+*set i (i+1)
+*if (i > e_nd)
+	*return
+*set l_etter s_tring#i
+*set {o_utput_variable} {o_utput_variable} & l_etter
+*goto loop1
+
+*label substr
+*params st_ring st_art l_ength ou_tput_variable
+*temp en_d (st_art + (l_ength - 1))
+*gosub substring st_ring st_art en_d ou_tput_variable
+*return
+
+*comment find str2 in str1  return position starting with 1, -1 if not there. if this returns 0, you have a problem
+*label indexOf
+*params s_tring1 s_tring2 c_ase_sensitive out_put_variable
+*temp i2 0
+*label loop2
+*set i2 (i2 + 1)
+*comment returns if out of room to fit str2
+*if (((i2 + length(s_tring2)) - 1) > length(s_tring1))
+	*set {out_put_variable} (0 - 1)
+	*return
+*gosub substr s_tring1 i2 length(s_tring2) out_put_variable
+*if (c_ase_sensitive)
+	*if ({out_put_variable} = s_tring2)
+		*set {out_put_variable} i2
+		*return
+	*goto loop2
+*else
+	*if ("$!!{{out_put_variable}}" = "$!!{s_tring2}")
+		*set {out_put_variable} i2
+		*return
+*goto loop2
+
+*label contains
+*params str_ing c_ontains ca_se_sensitive outp_ut_variable
+*gosub indexOf str_ing c_ontains ca_se_sensitive outp_ut_variable
+*set {outp_ut_variable} ({outp_ut_variable} > (0 - 1))
+*return
+
+
+*label trim
+*comment uhhh I'll make this later
+*return
+
+
+*label replaceFirst
+*params s_tring3 to_replace replace_with case_sensitive output_variable
+*gosub indexOf s_tring3 to_replace case_sensitive output_variable
+*if ({output_variable} > (0 - 1))
+	*temp i3 0
+	*temp p_rocess {output_variable}
+	*set {output_variable} ""
+	*label loop3
+	*set i3 (i3 + 1)
+	*if (i3 = p_rocess)
+		*set {output_variable} ({output_variable} & replace_with)
+		*set i3 (i3 + (length(to_replace) - 1))
+		*goto loop3
+	*elseif (i3 > length(s_tring3))
+		*return
+	*else
+		*set {output_variable} ({output_variable} & (s_tring3#i3))
+		*goto loop3
+*else
+	*set {output_variable} s_tring3
+	*return
+
+*comment please, for the love of tacos, don't include the string you are replacing inside of the string you are replacing it with. I'm to lazy and dumb to make something that works around that, so instead it throws and error
+*label replaceAll
+*params s_tring4 to_replace2 replace_with2 case_sensitive2 output_variable2
+*temp r_eturn ""
+*gosub contains replace_with2 to_replace2 case_sensitive2 "r_eturn"
+*if (r_eturn)
+	*bug Do not include the string you are replacing inside of the string you are replacing it with in ReplaceAll
+	*return
+*gosub replaceFirst s_tring4 to_replace2 replace_with2 case_sensitive2 output_variable2
+*gosub contains {output_variable2} to_replace2 case_sensitive2 "r_eturn"
+*if (r_eturn)
+	*gosub replaceAll {output_variable2} to_replace2 replace_with2 case_sensitive2 output_variable2
+*return
+
+
+
+
+*comment -------------- everything below this line is legacy v7 and below (used for lists/arrays and checkpoint saving) --------------
+
+*label find
+*temp foods "^nyghtberrie^brumbleberrie^apple^pecan^grape^plum"
+*temp aa "lists_listname"
+*comment takes in lists_listname, lists_index
+*comment this next part takes the pointer and changes it to the correct list string. This may seem redundant but it creates uniform use for 'find' and 'replace'  IT IS NOT NEEDED IN THE 'REPLACE' SCRIPT
+*temp lists_holder lists_listname
+*set lists_listname {lists_listname}
+*if lists_index = 0
+ *return
+*temp lists_char 0
+*temp lists_count 0
+*temp lists_string ""
+*temp letter
+*label alpha
+*set lists_char + 1
+*if (lists_char > length(lists_listname))
+    *goto beta
+*set letter lists_listname#lists_char
+*if letter = "^"
+  *set lists_count + 1
+  *if lists_count = lists_index
+    *goto beta
+  *else
+    *goto alpha
+*else
+  *goto alpha
+*label beta
+*set lists_char (lists_char + 1)
+*if (lists_char > length(lists_listname))
+    *goto endofthisone
+*set letter lists_listname#lists_char
+*if (letter = "") or (letter = "^")
+  *goto endofthisone
+*else
+  *set lists_string (lists_string & letter)
+  *goto beta
+*label endofthisone
+*set lists_output lists_string
+*set lists_listname lists_holder
+*return
+*comment -------------------------------------
+*comment takes in lists_listname, lists_index
+*label delete
+*temp repdel "del"
+*goto combine
+*comment takes in lists_listname, lists_index, lists_replace
+*label replace
+*temp repdel "rep"
+*goto combine
+*label combine
+*if lists_index = 0
+ *return
+*temp lists_char 0
+*temp lists_count 0
+*temp lists_string1 ""
+*temp lists_char2 0
+*temp lists_string2 ""
+*temp letter ""
+*comment first- finds where the item starts
+*label first
+*if lists_count = lists_index
+ *goto second
+*else
+ *if (lists_char > (length({lists_listname})-1))
+  *goto second
+ *set lists_char + 1
+ *if ({lists_listname}#lists_char) = "^"
+  *set lists_count + 1
+ *goto first
+*comment second- finds when the item or list ends
+*label second
+*set lists_char2 (lists_char + 1)
+*label second2
+*if (lists_char2 > length({lists_listname}))
+ *goto third
+*set letter {lists_listname}#lists_char2
+*if (letter = "^") or (letter = "")
+ *goto third
+*else
+ *set lists_char2 + 1
+ *goto second2
+*comment third/fourth- sets the first string up
+*label third
+*set lists_count 0
+*label fourth
+*set lists_count + 1
+*if repdel = "rep"
+ *if lists_count = (lists_char + 1)
+  *goto fifth
+ *else
+  *set lists_string1 (lists_string1 & ({lists_listname}#lists_count))
+  *goto fourth
+*else
+ *if lists_count = lists_char
+  *goto fifth
+ *else
+  *set lists_string1 (lists_string1 & ({lists_listname}#lists_count))
+  *goto fourth
+*comment fifth- sets the second string up
+*label fifth
+*set lists_count lists_char2
+*label sixth
+*if (lists_count > length({lists_listname}))
+ *goto seventh
+*if ({lists_listname}#lists_count) = ""
+ *goto seventh
+*else
+ *set lists_string2 (lists_string2 & ({lists_listname}#lists_count))
+ *set lists_count + 1
+ *goto sixth
+*comment seventh- connects the strings
+*label seventh
+*if repdel = "rep"
+ *set {lists_listname} ((lists_string1 & lists_replace) & lists_string2)
+ *return
+*else
+ *set {lists_listname} (lists_string1 & lists_string2)
+ *return
+*comment -------------------------------------
+*comment takes in lists_listname     outputs: lists_output
+*label count
+*temp lists_count 0
+*temp lists_char 1
+*label omnom
+*if (lists_char > length({lists_listname}))
+ *goto monmo
+*if ({lists_listname}#lists_char) = "^"
+ *set lists_count + 1
+*set lists_char + 1
+*goto omnom
+
+*label monmo
+*set lists_output lists_count
+*return
+*comment -------------------------------------
+*comment takes in save_num,  saves into save_{save_num}b  lists as ~item~item~item needs a save_{save_num}b
+*comment player creates save_1 save_1b
+*comment repeat until end of list: add the contents of that variable to the saveB and repeat
+*label save
+*temp wows save_num
+*temp save_num2 save_num
+*set save_num ("save_" & save_num)
+*set save_num2 ("save_" & (save_num2 & "b"))
+*temp saves_string ""
+*temp saves_char 2
+*label save2
+*if (saves_char > length({save_num}))
+ *set {save_num2} {save_num2} & ("~" & {saves_string})
+ *set save_num wows
+ *return
+*if ((({save_num})#saves_char) = "~")
+ *set {save_num2} {save_num2} & ("~" & {saves_string})
+ *set saves_string ""
+ *set saves_char +1
+ *goto save2
+*else
+ *set saves_string (saves_string & (({save_num})#saves_char))
+ *set saves_char +1
+ *goto save2
+*comment -------------------------------------
+*takes in save_num
+*label load
+*temp wows save_num
+*temp save_num2 save_num
+*set save_num ("save_" & save_num)
+*set save_num2 ("save_" & (save_num2 & "b"))
+*temp saves_string ""
+*temp saves_char 0
+*temp saves_count 0
+*temp index 1
+*temp letter ""
+*temp holder ""
+*comment ---------------------------
+*temp indextotal 0
+*temp lists_char 1
+*label loada
+*if (lists_char > length({save_num2}))
+ *goto loadb
+*if ({save_num2}#lists_char) = "~"
+ *set indextotal + 1
+*set lists_char + 1
+*goto loada
+*label loadb
+*comment ----------------------------
+*label load2
+*set saves_char + 1
+*if (saves_char > length({save_num}))
+    *goto load3
+*set letter {save_num}#saves_char
+*if letter = "~"
+  *set saves_count + 1
+  *if saves_count = index
+    *goto load3
+  *else
+    *goto load2
+*else
+  *goto load2
+*label load3
+*set saves_char (saves_char + 1)
+*if (saves_char > length({save_num}))
+    *goto load4
+*set letter {save_num}#saves_char
+*if (letter = "") or (letter = "~")
+  *goto load4
+*else
+  *set saves_string (saves_string & letter)
+  *goto load3
+*label load4
+*set holder saves_string
+*set saves_string ""
+*set letter ""
+*set saves_count 0
+*set saves_char 0
+*label load5
+*set saves_char + 1
+*if (saves_char > length({save_num2}))
+    *goto load6
+*set letter {save_num2}#saves_char
+*if letter = "~"
+  *set saves_count + 1
+  *if saves_count = index
+    *goto load6
+  *else
+    *goto load5
+*else
+  *goto load5
+*label load6
+*set saves_char (saves_char + 1)
+*if (saves_char > length({save_num2}))
+    *goto load7
+*set letter {save_num2}#saves_char
+*if (letter = "") or (letter = "~")
+  *goto load7
+*else
+  *set saves_string (saves_string & letter)
+  *goto load6
+*label load7
+*set {holder} saves_string
+*if not(index >= indextotal)
+ *set index +1
+ *set saves_string ""
+ *set letter ""
+ *set saves_count 0
+ *set saves_char 0
+ *goto load2
+*set save_num wows
+*return
