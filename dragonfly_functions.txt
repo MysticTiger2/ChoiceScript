@@ -1,0 +1,45 @@
+*return
+*comment -------------------------------------
+*comment	This is version 1 (Feb 19 2021)
+*comment	Check on the ChoiceScript forums for updates
+*comment	Made by @Twiger_Fluff aka Twig Wisp aka Taco Tiger
+*comment	You should, when possible, credit me "@Twiger_Fluff|ChoiceScript forums"
+*comment -------------------------------------
+
+
+*comment	limits: dev must have a key dev key. gameinstance ID can't be longer than 10 characters. player ID can't be longer than 15 characters. data can't be more than 1000 characters
+
+*comment	the data sent must be URL-safe. spaces in data will automatically be converted to the character ~ and back. any occurances of the ~ character in the data will become a space
+
+
+
+*comment	it is suggested your readers turn page animations off for use of pagebreak funtions
+*comment	 note to self: make it so the *script automatically turns page animations off and then back to what they were set to
+
+*label JS_SUPPRESSS
+*comment this is bad. dont do this. it doesn't even work
+*script var regular_error = window.onerror; window.onerror = function(message, url, lineNumber) { if (message.includes("dragonfly_data")) {return true;} else {return regular_error(message, url, lineNumber);} };
+*return
+
+
+*label SendAndGetData_PageBreak
+*params df_data
+*set dragonfly_outgoingdata df_data
+*script var xmlHttp = new XMLHttpRequest; xmlHttp.onreadystatechange = function(){if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)}; xmlHttp.open("GET", "https://scratchfoxbot.wixsite.com/epiccoins/_functions/choicescriptput/" + this.stats.dragonfly_dev + "/" + this.stats.dragonfly_gameinstance + "/" + this.stats.dragonfly_player + "/" + this.stats.dragonfly_outgoingdata.replace(/ /g, "~"), true); xmlHttp.setRequestHeader("Accept", "application/json"); xmlHttp.send(null); function callback(response) { response = JSON.parse(response); this.stats.dragonfly_playercount = response.length; this.stats.dragonfly_playerlist = ""; response.forEach(element => {this.stats["dragonfly_data_" + element.playerID] = element.data; this.stats.dragonfly_playerlist += ("^" + element.playerID);}); document.getElementsByClassName("next")[0].click();}
+*page_break loading…
+*return
+
+*label GetData_PageBreak
+*script var xmlHttp = new XMLHttpRequest; xmlHttp.onreadystatechange = function(){if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)}; xmlHttp.open("GET", "https://scratchfoxbot.wixsite.com/epiccoins/_functions/choicescriptget/" + this.stats.dragonfly_dev + "/" + this.stats.dragonfly_gameinstance, true); xmlHttp.setRequestHeader("Accept", "application/json"); xmlHttp.send(null); function callback(response) { response = JSON.parse(response); this.stats.dragonfly_playercount = response.length; this.stats.dragonfly_playerlist = ""; response.forEach(element => {this.stats["dragonfly_data_" + element.playerID] = element.data; this.stats.dragonfly_playerlist += ("^" + element.playerID);}); document.getElementsByClassName("next")[0].click();}
+*page_break loading…
+*return
+
+*label SendAndGetData
+*params df_data
+*set dragonfly_outgoingdata df_data
+*script var xmlHttp = new XMLHttpRequest; xmlHttp.onreadystatechange = function(){if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)}; xmlHttp.open("GET", "https://scratchfoxbot.wixsite.com/epiccoins/_functions/choicescriptput/" + this.stats.dragonfly_dev + "/" + this.stats.dragonfly_gameinstance + "/" + this.stats.dragonfly_player + "/" + this.stats.dragonfly_outgoingdata.replace(/ /g, "~"), true); xmlHttp.setRequestHeader("Accept", "application/json"); xmlHttp.send(null); function callback(response) { response = JSON.parse(response); this.stats.dragonfly_playercount = response.length; this.stats.dragonfly_playerlist = ""; response.forEach(element => {this.stats["dragonfly_data_" + element.playerID] = element.data; this.stats.dragonfly_playerlist += ("^" + element.playerID);}); }
+*return
+
+*label GetData
+*script var xmlHttp = new XMLHttpRequest; xmlHttp.onreadystatechange = function(){if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)}; xmlHttp.open("GET", "https://scratchfoxbot.wixsite.com/epiccoins/_functions/choicescriptget/" + this.stats.dragonfly_dev + "/" + this.stats.dragonfly_gameinstance, true); xmlHttp.setRequestHeader("Accept", "application/json"); xmlHttp.send(null); function callback(response) { response = JSON.parse(response); this.stats.dragonfly_playercount = response.length; this.stats.dragonfly_playerlist = ""; response.forEach(element => {this.stats["dragonfly_data_" + element.playerID] = element.data; this.stats.dragonfly_playerlist += ("^" + element.playerID);}); }
+*return
