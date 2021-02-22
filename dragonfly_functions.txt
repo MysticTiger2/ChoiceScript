@@ -26,11 +26,13 @@
 *params df_data
 *set dragonfly_outgoingdata df_data
 *script var xmlHttp = new XMLHttpRequest; xmlHttp.onreadystatechange = function(){if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)}; xmlHttp.open("GET", "https://scratchfoxbot.wixsite.com/epiccoins/_functions/choicescriptput/" + this.stats.dragonfly_dev + "/" + this.stats.dragonfly_gameinstance + "/" + this.stats.dragonfly_player + "/" + this.stats.dragonfly_outgoingdata.replace(/ /g, "~"), true); xmlHttp.setRequestHeader("Accept", "application/json"); xmlHttp.send(null); function callback(response) { response = JSON.parse(response); this.stats.dragonfly_playercount = response.length; this.stats.dragonfly_playerlist = ""; response.forEach(element => {this.stats["dragonfly_data_" + element.playerID] = element.data; this.stats.dragonfly_playerlist += ("^" + element.playerID);}); document.getElementsByClassName("next")[0].click();}
+…
 *page_break loading…
 *return
 
 *label GetData_PageBreak
 *script var xmlHttp = new XMLHttpRequest; xmlHttp.onreadystatechange = function(){if (xmlHttp.readyState == 4 && xmlHttp.status == 200) callback(xmlHttp.responseText)}; xmlHttp.open("GET", "https://scratchfoxbot.wixsite.com/epiccoins/_functions/choicescriptget/" + this.stats.dragonfly_dev + "/" + this.stats.dragonfly_gameinstance, true); xmlHttp.setRequestHeader("Accept", "application/json"); xmlHttp.send(null); function callback(response) { response = JSON.parse(response); this.stats.dragonfly_playercount = response.length; this.stats.dragonfly_playerlist = ""; response.forEach(element => {this.stats["dragonfly_data_" + element.playerID] = element.data; this.stats.dragonfly_playerlist += ("^" + element.playerID);}); document.getElementsByClassName("next")[0].click();}
+…
 *page_break loading…
 *return
 
